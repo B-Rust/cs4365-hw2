@@ -40,7 +40,7 @@ class cspProblem:
 
         # TODO - fill varDomains
         # Fill varDomains
-
+        print("Still need to fill out the domains\n")
 
         varFile.close()
 
