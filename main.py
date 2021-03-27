@@ -103,15 +103,19 @@ class cspNode:
         parent = par
         varList = varL
 
+    # TODO code this
+    def checkCorrect(self):
+        # If constraints are violated
+        #       print out current values & failure
+        # If constraints are not violated
+            # If all the variables are filled
+                # Print out variables & success
+            # getSuccessors & add them to the cspProblem.getSolution queue
+        return None
 
-
-def read_in_var_file():
-    print("To Do: read in the variable file")
-    return str
-
-def read_in_con_file():
-    print("To Do: read in the cons file")
-    return str
+    def getSuccessors(self):
+        # Stuff
+        return None
 
 # Most ConstrainED VARiable
 def mCedVar():
@@ -132,7 +136,7 @@ def lCV():
     return 0
 
 
-# Press the green button in the gutter to run the script.
+# main
 if __name__ == '__main__':
     main()
 
