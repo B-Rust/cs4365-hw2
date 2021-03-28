@@ -25,7 +25,7 @@ def main():
 # class of the entire CSP problem
 class cspProblem:
     varList = []
-    varDomains = []
+    varDomains = [] * 1
     conList = []
     forChecking = None
 
@@ -33,14 +33,25 @@ class cspProblem:
     def fillVar(self, varFilename):
         varFile = open(varFilename, "r")
 
+        i = 0
         # Fill varList
         for line in varFile:
+            # Fill varList
             self.varList.append(line[0])
-        print(self.varList)
 
-        # TODO - fill varDomains
-        # Fill varDomains
-        print("Still need to fill out the domains\n")
+            # Fill varDomains
+            j = 0
+            l = []
+            values = line.split()
+            values.pop(0)
+            for x in values:
+                l.append(x)
+            self.varDomains.append(l)
+            i = i + 1
+
+        # Unnecessary printing as proof
+        print(self.varList, "\n")
+        print(self.varDomains, "\n")
 
         varFile.close()
 
@@ -57,13 +68,13 @@ class cspProblem:
     # Fill the forChecking variable
     def fillForCheck(self, forCheck):
         if (forCheck == "fc"):
-            print("Yes FC\n")
+            print("\nYes FC\n")
             forChecking = True
         elif (forCheck == "none"):
-            print("No FC\n")
+            print("\nNo FC\n")
             forChecking = False
         else:
-            print("Unsure if FC, defaulting to yes \n")
+            print("\nUnsure if FC, defaulting to yes \n")
             forChecking = True
 
     # Fill the cspProblem with the values/files from the commandLine
