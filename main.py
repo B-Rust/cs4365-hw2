@@ -235,9 +235,11 @@ class cspNode:
         list = []
 
 # Hardcoded success case ----------------------------
+        print("\n   ----Hardcoded success setup for var1 con1:---- \n\n")
         self.varValues = [5, 2, 2, 1, 1, 1]
         next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 # Hardcoded failure case
+        print("\n   ----Hardcoded failure setup for var1 con1:---- \n\n")
 #        self.varValues = [5, 2, 1, 1, 1, 1]
 #        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 #------------------------
@@ -245,10 +247,21 @@ class cspNode:
         # returns & stores the position of the next variable in the varL list
         nextVar = self.nextVar()
 
+
         # TODO
         # For that variable, return all possible values,
-        # and create cspNodes with each of them, amd store them in the list
+
+            # TODO  Forward Checking
+            # For each variable domain in the nodes you're about to create,
+            # use forward checking here to delete constraint-violating values from domains
+            # after doing so, if any domain is empty, return failure?
+                # Figure out how to return failure from this function
+
+        # and create cspNodes with each of these values, amd store them in the list
         # from worst to last
+
+
+
 
         print("Returned successor\n")
         # IMPORTANT: for list, store the worst states first and the
@@ -261,35 +274,66 @@ class cspNode:
         print("Ought to print values rn")
         return None
 
+    # Returns the next unassigned variable
     def nextVar(self):
+        # something to hold the results of the functions
         nextVar = None
-        nextVar = self.getMCedVar()
+
+        # make a list of unassigned variables to pass into each function
+        # do it once now instead of once in each function
+        blankVars = []
+        for x in self.varList:
+            if(self.varValues[self.varList.index(x)] is None):
+                blankVars.append(x)
+
+        nextVar = self.getMCedVar(blankVars)
         if nextVar is False:
-            nextVar = self.getMCingVar()
+            nextVar = self.getMCingVar(blankVars)
         if nextVar is False:
-            nextVar = self.getABVar()
+            nextVar = self.getABVar(blankVars)
 
         return nextVar
 
     # TODO
     # Returns the most constrained unassigned variable
     # If two variables are equally constrained, returns false
-    def getMCedVar(self):
-        print ("Getting the most constraining variable")
+    def getMCedVar(self, blankVars):
+        print("Getting the most constraining variable")
+        nextVar = False
+        nextVarLenDomain = 10000 # should be max num but whatever
 
-        return False
+        # for all unassigned variables
+        for x in blankVars:
+            # if the number of values is less than the current nextVar's
+            if (len(self.varDomains[self.varList.index(x)]) < nextVarLenDomain):
+                # replace it with this variable
+                nextVar = x
+                nextVarLenDomain = len(self.varDomains[self.varList.index(x)])
+
+            # if the number of values is equal to the current nextVar's
+            if (len(self.varDomains[self.varList.index(x)]) == nextVarLenDomain):
+                # replace it with False
+                nextVar = False
+
+        return nextVar
 
     # TODO
     # Returns the most constraining unassigned variable
     # If two variables are equally constraining, returns false
-    def getMCingVar(self):
+    def getMCingVar(self, blankVars):
         print("Getting the most constrained variable")
+        nextVar = False
+        numConstraints = -1 # should be max num but whatever
+
+        for x in blankVars:
+            print (x)
+
 
         return False
 
     # TODO
     # Returns the next unassigned variable alphabetically
-    def getABVar(self):
+    def getABVar(self, blankVars):
         print("Getting the alphabetically next variable")
 
         return False
