@@ -242,6 +242,14 @@ class cspNode:
 #        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 #------------------------
 
+        # returns & stores the position of the next variable in the varL list
+        nextVar = self.nextVar()
+
+        # TODO
+        # For that variable, return all possible values,
+        # and create cspNodes with each of them, amd store them in the list
+        # from worst to last
+
         print("Returned successor\n")
         # IMPORTANT: for list, store the worst states first and the
         # best states last
@@ -253,26 +261,52 @@ class cspNode:
         print("Ought to print values rn")
         return None
 
-# TODO
-# Most ConstrainED VARiable
-def mCedVar():
-    print("TODO")
-    return 0
+    def nextVar(self):
+        nextVar = None
+        nextVar = self.getMCedVar()
+        if nextVar is False:
+            nextVar = self.getMCingVar()
+        if nextVar is False:
+            nextVar = self.getABVar()
 
-# TODO
-# Most ConstrainING VARiable
-def mCingVar():
-    print("TODO")
+        return nextVar
 
-    # if there's still a tie, break it alphabetically
-    return 0
+    # TODO
+    # Returns the most constrained unassigned variable
+    # If two variables are equally constrained, returns false
+    def getMCedVar(self):
+        print ("Getting the most constraining variable")
 
-# TODO
-# Least Constraining Value
-def lCV():
-    print("TODO")
-    #if there's a tie, go with the smaller  number
-    return 0
+        return False
+
+    # TODO
+    # Returns the most constraining unassigned variable
+    # If two variables are equally constraining, returns false
+    def getMCingVar(self):
+        print("Getting the most constrained variable")
+
+        return False
+
+    # TODO
+    # Returns the next unassigned variable alphabetically
+    def getABVar(self):
+        print("Getting the alphabetically next variable")
+
+        return False
+
+    # TODO
+    # Returns the most constraining unassigned value
+    def getMCedVal(self):
+        print ("Getting the most constraining value")
+
+        return False
+
+    # TODO
+    # Returns the next unassigned value numerically
+    def getNumVal(self):
+        print("Getting the alphabetically next variable")
+
+        return False
 
 
 # main
