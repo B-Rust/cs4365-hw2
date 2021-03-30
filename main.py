@@ -223,6 +223,14 @@ class cspNode:
             else:
                 print("constraint: ", con, " is broken")
                 return False;
+
+        elif (l[1] == "!"):
+            if (self.varValues[self.varList.index(l[0])] is not self.varValues[self.varList.index(l[2])]):
+                print("constraint: ", con, " is not broken")
+            else:
+                print("constraint: ", con, " is broken")
+                return False;
+
         else:
             print("Middle value (should be >, =, <) is not recognized")
             return False
@@ -239,7 +247,7 @@ class cspNode:
         self.varValues = [5, 2, 2, 1, 1, 1]
         next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 # Hardcoded failure case
-        print("\n   ----Hardcoded failure setup for var1 con1:---- \n\n")
+#        print("\n   ----Hardcoded failure setup for var1 con1:---- \n\n")
 #        self.varValues = [5, 2, 1, 1, 1, 1]
 #        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 #------------------------
@@ -250,6 +258,7 @@ class cspNode:
 
         # TODO
         # For that variable, return all possible values,
+        nextVals = self.nextVals()
 
             # TODO  Forward Checking
             # For each variable domain in the nodes you're about to create,
@@ -272,6 +281,12 @@ class cspNode:
     # Prints out the current values
     def printValues(self):
         print("Ought to print values rn")
+        # Must find a way to print out values
+        # in the order that they were assigned
+
+            # might just have to make an attribute of cspNode that's
+            # "orderOfVars" and keeps track of the order they were added
+
         return None
 
     # Returns the next unassigned variable
@@ -298,9 +313,9 @@ class cspNode:
     # Returns the most constrained unassigned variable
     # If two variables are equally constrained, returns false
     def getMCedVar(self, blankVars):
-        print("Getting the most constraining variable")
+        print("Getting the most constrained variable")
         nextVar = False
-        nextVarLenDomain = 10000 # should be max num but whatever
+        nextVarLenDomain = 100000 # should be max num but whatever
 
         # for all unassigned variables
         for x in blankVars:
@@ -321,12 +336,19 @@ class cspNode:
     # Returns the most constraining unassigned variable
     # If two variables are equally constraining, returns false
     def getMCingVar(self, blankVars):
-        print("Getting the most constrained variable")
+        print("Getting the most constraining variable")
+        numConstraints = [None] * len(blankVars)
         nextVar = False
-        numConstraints = -1 # should be max num but whatever
+        numConstraints = -1
 
+        # For each blank variable
         for x in blankVars:
-            print (x)
+            # Count the number of constraints that it is in
+            # where the other variable's value is also none
+
+
+            print("yo")
+
 
 
         return False
@@ -336,11 +358,25 @@ class cspNode:
     def getABVar(self, blankVars):
         print("Getting the alphabetically next variable")
 
+        # Use these to determine the more preferred values
+        self.getLCVal()
+        self.getNumVal()
+
+
+        return False
+
+    # TODO
+    # Returns a list of all possible values for the selected variable
+    # Specifically in the order of least-constricting and then alphabetical
+    def nextVals(self, var):
+        print("Returns a list of the next values")
+
+
         return False
 
     # TODO
     # Returns the most constraining unassigned value
-    def getMCedVal(self):
+    def getLCVal(self):
         print ("Getting the most constraining value")
 
         return False
