@@ -108,7 +108,8 @@ class cspProblem:
 
         # creates root node
         varV = [None] * len(self.varList)
-        cspRoot = cspNode(None, self.varList, self.varDomains, self.conList, self.forChecking, varV)
+        ordV = [None] * len(self.varList)
+        cspRoot = cspNode(None, self.varList, self.varDomains, self.conList, self.forChecking, varV, ordV)
 
         # create a stack of nodes (insert lowest priority values first)
         stack = []
@@ -117,7 +118,7 @@ class cspProblem:
         while stack: #while stack has values
             temp = stack.pop()
 
-            #print("New node popped off the stack, values are", temp.varValues, "\n")
+            print("\n\nNew node popped off the stack, values are", temp.varValues)
             #for x in range(0, len(stack)):
             #    print("\n\tRemaining stacc values: ", stack[x].varValues)
 
@@ -174,17 +175,18 @@ class cspNode:
     varValues = []
     conList = []
     forChecking = None
+    orderVars = []
 
     # Initialize all variables
-    def __init__(self, par, varL, varD, conL, fCheck, varV):
-        print("Making new CSP node, values are:", varV, "\n\n")
+    def __init__(self, par, varL, varD, conL, fCheck, varV, ordV):
+        #print("Making new CSP node, values are:", varV, "\n\n")
         self.parent = par
         self.varList = varL
         self.varDomains = varD
         self.conList = conL
         self.forChecking = fCheck
         self.varValues = varV
-
+        self.orderVars = ordV
 
     # Returns true if the current values for the
     # variables do not violate any constraint
@@ -239,7 +241,7 @@ class cspNode:
                 return False;
 
         else:
-            print("Middle value (should be >, =, <) is not recognized")
+            print("Middle value (should be >, =, <, or !) is not recognized")
             return False
         return True
 
@@ -251,6 +253,7 @@ class cspNode:
 
         # returns & stores the position of the next variable in the varL list
         nextVar = self.nextVar()
+        self.orderVars.append(nextVar)
 
         # TODO
         # For that variable, return all possible values,
@@ -266,7 +269,7 @@ class cspNode:
         # from worst to last
         for x in nextVals:
             self.varValues[self.varList.index(nextVar)] = x
-            tempCSPnode = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
+            tempCSPnode = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues, self.orderVars)
             #print("Appending CSP node w/ values:", tempCSPnode.varValues)
             list.append(copy.deepcopy(tempCSPnode))
             #print("Current list, list = ")
@@ -284,7 +287,7 @@ class cspNode:
         #        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
 # ------------------------
 
-        print("Returned successor\n")
+        print("Returning successors\n")
         # IMPORTANT: for list, store the worst states first and the
         # best states last
         #list.append(next)      For the hardcoded solutions
@@ -299,10 +302,13 @@ class cspNode:
         print("Ought to print values rn")
         # Must find a way to print out values
         # in the order that they were assigned
-
-            # might just have to make an attribute of cspNode that's
-            # "orderOfVars" and keeps track of the order they were added
-
+        for x in range(0, len(self.orderVars)):
+            if(self.orderVars[x] is None):
+                continue
+            if (x < (len(self.orderVars)-1)):
+                print(self.orderVars[x] + "=" + self.varValues[self.varList.index(self.orderVars[x])] + ",", end=" ")
+            else:
+                print(self.orderVars[x] + "=" + self.varValues[self.varList.index(self.orderVars[x])], end=" ")
         return None
 
     # Returns the next unassigned variable
@@ -402,29 +408,45 @@ class cspNode:
     # Specifically in the order of least-constricting and then alphabetical
     def nextVals(self, var):
         print("Returns a list of the next values")
-        # Use these to determine the more preferred values
-        self.getLCVal()
-        self.getNumVal()
 
+        # make a list of all the unassigned values
+        unassignedVals = copy.deepcopy(self.varDomains)
+
+        # make a list to hold all the values
+        # valList is in the order least restricting -> most restricting
+        #   or A -> Z       append A first
+        valList = []
+
+        # TODO
+        # for the number of values:
+            # append the next most desired value to the list
+            # ideally least-constricting, but in a tie, alphabetically
+
+            #self.getLCVal(var, unassignedVals)
+        valList = self.getNumVal(var, unassignedVals)
+
+
+
+        # Since valList is in the order least->most restricting, or A->Z
+        # Flip it before returning it
+        valList.reverse()
+        return valList
+
+    # TODO
+    # Returns the most constraining unassigned value
+    def getLCVal(self, var):
+        print ("Getting the most constraining value")
+
+        return False
+
+    # Returns the next unassigned values numerically
+    def getNumVal(self, var, unassignedVals):
+        print("Getting the alphabetically next variable")
         list = []
         for x in self.varDomains[self.varList.index(var)]:
             list.append(x)
 
         return list
-
-    # TODO
-    # Returns the most constraining unassigned value
-    def getLCVal(self):
-        print ("Getting the most constraining value")
-
-        return False
-
-    # TODO
-    # Returns the next unassigned value numerically
-    def getNumVal(self):
-        print("Getting the alphabetically next variable")
-
-        return False
 
 
 # main
