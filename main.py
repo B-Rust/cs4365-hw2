@@ -128,10 +128,7 @@ class cspProblem:
             if(not temp.isCorrect()):
                 # Print out values
                 temp.printValues()
-                print ("\tFailure")
-                #TODO      replace "return None" with "continue"
-                # once a non-hardcoded getSuccessor() is working
-                #return None
+                print ("\tfailure")
                 continue
 
             #   if the current values don't violate constraints
@@ -148,7 +145,7 @@ class cspProblem:
                 if hasAllValues:
                     # print values and print success
                     temp.printValues()
-                    print("\tSolution")
+                    print("\tsolution")
                     return None
                     # end function here
                 # if it doesn't have all values filled
@@ -170,6 +167,7 @@ class cspProblem:
 
 # Class of an individual CSP node
 class cspNode:
+    counter = 1
     parent = None #parent node
     varList = []
     varDomains = []
@@ -249,7 +247,7 @@ class cspNode:
             return False
         return True
 
-    # TODO code this
+
     # returns a list of nodes that are successors to this node
     # a successor all the next possible values for
     def getSuccessors(self):
@@ -259,7 +257,6 @@ class cspNode:
         nextVar = self.nextVar()
         self.orderVars.append(nextVar)
 
-        # TODO
         # For that variable, return all possible values,
         nextVals = self.nextVals(nextVar)
 
@@ -303,9 +300,11 @@ class cspNode:
 
         return list
 
+
     # Prints out the current values
     def printValues(self):
-        #print("Ought to print values rn")
+        print(cspNode.counter, end=". ")
+        cspNode.counter = cspNode.counter + 1
         # Must find a way to print out values
         # in the order that they were assigned
         for x in range(0, len(self.orderVars)):
@@ -320,7 +319,7 @@ class cspNode:
     # Returns the next unassigned variable
     def nextVar(self):
         # something to hold the results of the functions
-        nextVar = None
+        nextVars = []
 
         # make a list of unassigned variables to pass into each function
         # do it once now instead of once in each function
@@ -336,40 +335,43 @@ class cspNode:
         if (len(blankVars) is 1):
             return blankVars[0]
 
-        nextVar = self.getMCedVar(blankVars)
-        #print("Most constrained var is :", nextVar)
-        if nextVar is False:
-            nextVar = self.getMCingVar(blankVars)
-            #print("Most constraining var is :", nextVar)
 
-        if nextVar is False:
-            nextVar = self.getABVar(blankVars)
-            #print("Most alphabetical var is :", nextVar)
 
-        return nextVar
+        # Returns the most constrained variable(s)
+        nextVars = self.getMCedVar(blankVars)
+        if (len(nextVars) == 1):
+            return nextVars[0]
+
+        # Returns the most constraining variable(s)
+        nextVars = self.getMCingVar(nextVars)
+        if (len(nextVars) == 1):
+            return nextVars[0]
+
+        nextVars = self.getABVar(nextVars)
+
+        return nextVars
 
     # Returns the most constrained unassigned variable
     # If two variables are equally constrained, returns false
     def getMCedVar(self, blankVars):
         #print("Getting the most constrained variable:")
-        nextVar = False
+        nextVars = []
         nextVarLenDomain = 100000 # should be max num but whatever
 
         # for all unassigned variables
         for x in blankVars:
             # if the number of values is equal to the current nextVar's
             if (len(self.varDomains[self.varList.index(x)]) == nextVarLenDomain):
-                # replace it with False
-                nextVar = False
+                nextVars.append(x)
 
             # if the number of values is less than the current nextVar's
             if (len(self.varDomains[self.varList.index(x)]) < nextVarLenDomain):
                 # replace it with this variable
-                nextVar = x
+                nextVars = [x]
                 #print(nextVar, ": ", len(self.varDomains[self.varList.index(x)]), "\n")
                 nextVarLenDomain = len(self.varDomains[self.varList.index(x)])
 
-        return nextVar
+        return nextVars
 
     # Returns the most constraining unassigned variable
     # If two variables are equally constraining, returns false
@@ -379,6 +381,7 @@ class cspNode:
     def getMCingVar(self, blankVars):
         #print("Getting the most constraining variable")
         varNumCons = []
+        nextVars = []
 
         # For each blank variable
         for x in blankVars:
@@ -391,14 +394,15 @@ class cspNode:
                 if((y[0] in blankVars) and (y[2] in blankVars) and \
                         ((y[0] is x) or (y[2] is x))):
                     numCons = numCons + 1
+            #print("x: ", x, "; numCons: ", numCons)
             varNumCons.append(numCons)
 
         maxCons = max(varNumCons)
-        numMaxes = varNumCons.count(maxCons)
-        if (numMaxes == 1):
-            return blankVars[varNumCons.index(maxCons)]
+        for x in range(0, len(varNumCons)):
+            if varNumCons[x] is maxCons:
+                nextVars.append(blankVars[x])
 
-        return False
+        return nextVars
 
     # Returns the next unassigned variable alphabetically
     def getABVar(self, blankVars):
@@ -407,7 +411,6 @@ class cspNode:
 
         return blankVars[0]
 
-    # TODO
     # Returns a list of all possible values for the selected variable
     # Specifically in the order of least-constricting and then alphabetical
     def nextVals(self, var):
@@ -453,7 +456,6 @@ class cspNode:
         #print("returning valList, it is:", valList)
         return valList
 
-    # TODO
     # Returns a list of the least constraining unassigned value
     def getLCVal(self, var, unassignedVals):
         #print("Getting the least constraining value(s)")
