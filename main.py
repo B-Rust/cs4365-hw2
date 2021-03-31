@@ -6,6 +6,7 @@
 # py main.py ex3.var ex3.con none
 
 import sys
+import copy
 
 # Main function which takes 3 commandline arguments and tries to find
 # a valid solution to the problems described in the files
@@ -116,6 +117,10 @@ class cspProblem:
         while stack: #while stack has values
             temp = stack.pop()
 
+            #print("New node popped off the stack, values are", temp.varValues, "\n")
+            #for x in range(0, len(stack)):
+            #    print("\n\tRemaining stacc values: ", stack[x].varValues)
+
         #   figure out if the current node violates any constraints
             #   if so
             if(not temp.isCorrect()):
@@ -124,7 +129,8 @@ class cspProblem:
                 print ("\tFailure")
                 #TODO      replace "return None" with "continue"
                 # once a non-hardcoded getSuccessor() is working
-                return None
+                #return None
+                continue
 
             #   if the current values don't violate constraints
             # if all the values are filled, it's a success
@@ -154,6 +160,7 @@ class cspProblem:
                         continue
                     else:
                         for y in l:
+                            #print("Adding y to stack, y values = ", y.varValues)
                             stack.append(y)
 
         print ("\n\nStack empty without finding a solution, complete failure\n")
@@ -170,7 +177,7 @@ class cspNode:
 
     # Initialize all variables
     def __init__(self, par, varL, varD, conL, fCheck, varV):
-        print("Initializing\n\n")
+        print("Making new CSP node, values are:", varV, "\n\n")
         self.parent = par
         self.varList = varL
         self.varDomains = varD
@@ -198,7 +205,7 @@ class cspNode:
         # if one of the variables in the constraint has
         # no value, skip
         if ((self.varValues[self.varList.index(l[0])] is None) or \
-                (self.varValues[self.varList.index(l[0])] is None)):
+                (self.varValues[self.varList.index(l[2])] is None)):
             print("At least one of the 2 values in constraint ", con, " is unassigned")
             return True
 
@@ -242,23 +249,12 @@ class cspNode:
     def getSuccessors(self):
         list = []
 
-# Hardcoded success case ----------------------------
-        print("\n   ----Hardcoded success setup for var1 con1:---- \n\n")
-        self.varValues = [5, 2, 2, 1, 1, 1]
-        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
-# Hardcoded failure case
-#        print("\n   ----Hardcoded failure setup for var1 con1:---- \n\n")
-#        self.varValues = [5, 2, 1, 1, 1, 1]
-#        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
-#------------------------
-
         # returns & stores the position of the next variable in the varL list
         nextVar = self.nextVar()
 
-
         # TODO
         # For that variable, return all possible values,
-        nextVals = self.nextVals()
+        nextVals = self.nextVals(nextVar)
 
             # TODO  Forward Checking
             # For each variable domain in the nodes you're about to create,
@@ -268,14 +264,34 @@ class cspNode:
 
         # and create cspNodes with each of these values, amd store them in the list
         # from worst to last
+        for x in nextVals:
+            self.varValues[self.varList.index(nextVar)] = x
+            tempCSPnode = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
+            #print("Appending CSP node w/ values:", tempCSPnode.varValues)
+            list.append(copy.deepcopy(tempCSPnode))
+            #print("Current list, list = ")
+            #for y in list:
+            #    print("\n\t", y.varValues)
 
 
-
+# Hardcoded success case ----------------------------
+#        print("\n   ----Hardcoded success setup for var1 con1:---- \n\n")
+#        self.varValues = [5, 2, 2, 1, 1, 1]
+#        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
+# Hardcoded failure case
+        #        print("\n   ----Hardcoded failure setup for var1 con1:---- \n\n")
+        #        self.varValues = [5, 2, 1, 1, 1, 1]
+        #        next = cspNode(self, self.varList, self.varDomains, self.conList, self.forChecking, self.varValues)
+# ------------------------
 
         print("Returned successor\n")
         # IMPORTANT: for list, store the worst states first and the
         # best states last
-        list.append(next)
+        #list.append(next)      For the hardcoded solutions
+        #print("Right before returning list, list = ")
+        #for y in list:
+        #    print("\n\t", y.varValues)
+
         return list
 
     # Prints out the current values
@@ -301,78 +317,100 @@ class cspNode:
             if(self.varValues[self.varList.index(x)] is None):
                 blankVars.append(x)
 
+
+        if (len(blankVars) is 0):
+            print("Major problem, somehow searching for another variable with no blank variables left")
+            exit -1
+
+        if (len(blankVars) is 1):
+            return blankVars[0]
+
         nextVar = self.getMCedVar(blankVars)
+        print("Most constrained var is :", nextVar)
         if nextVar is False:
             nextVar = self.getMCingVar(blankVars)
+            print("Most constraining var is :", nextVar)
+
         if nextVar is False:
             nextVar = self.getABVar(blankVars)
+            print("Most alphabetical var is :", nextVar)
 
         return nextVar
 
-    # TODO
     # Returns the most constrained unassigned variable
     # If two variables are equally constrained, returns false
     def getMCedVar(self, blankVars):
-        print("Getting the most constrained variable")
+        #print("Getting the most constrained variable:")
         nextVar = False
         nextVarLenDomain = 100000 # should be max num but whatever
 
         # for all unassigned variables
         for x in blankVars:
-            # if the number of values is less than the current nextVar's
-            if (len(self.varDomains[self.varList.index(x)]) < nextVarLenDomain):
-                # replace it with this variable
-                nextVar = x
-                nextVarLenDomain = len(self.varDomains[self.varList.index(x)])
-
             # if the number of values is equal to the current nextVar's
             if (len(self.varDomains[self.varList.index(x)]) == nextVarLenDomain):
                 # replace it with False
                 nextVar = False
+
+            # if the number of values is less than the current nextVar's
+            if (len(self.varDomains[self.varList.index(x)]) < nextVarLenDomain):
+                # replace it with this variable
+                nextVar = x
+                #print(nextVar, ": ", len(self.varDomains[self.varList.index(x)]), "\n")
+                nextVarLenDomain = len(self.varDomains[self.varList.index(x)])
 
         return nextVar
 
     # TODO
     # Returns the most constraining unassigned variable
     # If two variables are equally constraining, returns false
+    # Note: returns unassigned variable with most constraints on other variables
+    #   Does NOT return the UV that eliminates the most other values from other
+    #   variable's domains
     def getMCingVar(self, blankVars):
         print("Getting the most constraining variable")
-        numConstraints = [None] * len(blankVars)
-        nextVar = False
-        numConstraints = -1
+        varNumCons = []
 
         # For each blank variable
         for x in blankVars:
             # Count the number of constraints that it is in
             # where the other variable's value is also none
+            numCons = 0
+            for y in self.conList:
+                # if the constraint where one thing is x,
+                # and the other is a blank variable numCons++
+                if((y[0] in blankVars) and (y[2] in blankVars) and \
+                        ((y[0] is x) or (y[2] is x))):
+                    numCons = numCons + 1
+            varNumCons.append(numCons)
 
-
-            print("yo")
-
-
+        maxCons = max(varNumCons)
+        numMaxes = varNumCons.count(maxCons)
+        if (numMaxes == 1):
+            return blankVars[varNumCons.index(maxCons)]
 
         return False
 
-    # TODO
     # Returns the next unassigned variable alphabetically
     def getABVar(self, blankVars):
-        print("Getting the alphabetically next variable")
+        print("Getting the alphabetically next value")
+        blankVars.sort()
 
-        # Use these to determine the more preferred values
-        self.getLCVal()
-        self.getNumVal()
-
-
-        return False
+        return blankVars[0]
 
     # TODO
     # Returns a list of all possible values for the selected variable
     # Specifically in the order of least-constricting and then alphabetical
     def nextVals(self, var):
         print("Returns a list of the next values")
+        # Use these to determine the more preferred values
+        self.getLCVal()
+        self.getNumVal()
 
+        list = []
+        for x in self.varDomains[self.varList.index(var)]:
+            list.append(x)
 
-        return False
+        return list
 
     # TODO
     # Returns the most constraining unassigned value
