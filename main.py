@@ -382,26 +382,31 @@ class cspNode:
         #print("Getting the most constraining variable")
         varNumCons = []
         nextVars = []
+        #print("potentialVars coming into MCingVar:", blankVars)
 
         # For each blank variable
         for x in blankVars:
             # Count the number of constraints that it is in
             # where the other variable's value is also none
             numCons = 0
-            for y in self.conList:
+            for z in self.conList:
+                y = z.split()
                 # if the constraint where one thing is x,
                 # and the other is a blank variable numCons++
-                if((y[0] in blankVars) and (y[2] in blankVars) and \
-                        ((y[0] is x) or (y[2] is x))):
+                if(((y[0] is x) and (self.varValues[self.varList.index(y[2])] is None)) or \
+                        ((y[2] is x) and (self.varValues[self.varList.index(y[2])] is None))):
                     numCons = numCons + 1
             #print("x: ", x, "; numCons: ", numCons)
             varNumCons.append(numCons)
 
         maxCons = max(varNumCons)
+        #print("maxCons = ", maxCons)
         for x in range(0, len(varNumCons)):
             if varNumCons[x] is maxCons:
                 nextVars.append(blankVars[x])
 
+        #print("current setup is: ", self.varValues)
+        #print("has to use most constraining variable, MCingVars are:", nextVars)
         return nextVars
 
     # Returns the next unassigned variable alphabetically
